@@ -25,9 +25,11 @@ while True:
             command = input("(customC2) ")
             if command == "q" or command == "quit" or command == "exit":
                 print('quitting console')
-                break
+                sock.shutdown(socket.SHUT_RDWR)
+                sock.close()
+                exit(0)
             connssl.sendall(command.encode())
-            data = connssl.recv(1024)
+            data = connssl.recv(4096)
             if not data:
                 break
             print(data.decode())

