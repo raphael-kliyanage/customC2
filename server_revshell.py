@@ -29,7 +29,7 @@ while True:
                 sock.close()
                 exit(0)
             connssl.sendall(command.encode())
-            data = connssl.recv(4096)
+            data = connssl.recv(1024)
             if not data:
                 break
             print(data.decode())
