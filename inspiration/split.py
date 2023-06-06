@@ -3,13 +3,16 @@
 import os
 import subprocess
 
-cmd = "cd C:/Users"
+#cmd = "cd C:/Users"
+cmd = "net user /priv"
 x = cmd.split()
 
 if x[0] == "cd" or x[0] == "dir":
     os.chdir(x[1])
     print("changed directory to {}".format(x[1]))
-    command = subprocess.Popen('ipconfig',shell=True,stdout=subprocess.PIPE)
+    command = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
     output, err = command.communicate()
 else:
-    print(x)
+    command = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+    output, err = command.communicate()
+    print(output)

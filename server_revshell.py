@@ -29,10 +29,10 @@ while True:
                 sock.close()
                 exit(0)
             connssl.sendall(command.encode())
-            data = connssl.recv(1024)
-            if not data:
+            reply = connssl.recv(1024)
+            if not reply:
                 break
-            print(data.decode())
+            print(reply)
     finally:
         connssl.shutdown(socket.SHUT_RDWR)
         connssl.close()
