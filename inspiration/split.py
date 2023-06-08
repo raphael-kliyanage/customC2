@@ -1,3 +1,7 @@
+# client_revershell
+# Version 0.3
+# Auteur : Raphaël KATHALUWA-LIYANAGE
+
 # code pour comprendre comment fonctionne la librairie
 # pour changer de répertoire dans le code final
 import os

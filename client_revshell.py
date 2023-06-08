@@ -1,3 +1,7 @@
+# client_revershell
+# Version 0.3
+# Auteur : Raphaël KATHALUWA-LIYANAGE
+
 # import des librairies suivantes :
 # socket = communication entre l'attaquant et la cible
 # ssl = chiffrement des échanges

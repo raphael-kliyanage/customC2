@@ -1,3 +1,7 @@
+# client_revershell
+# Version 0.3
+# Auteur : Raphaël KATHALUWA-LIYANAGE
+
 import socket
 import ssl
 
