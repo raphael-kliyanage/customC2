@@ -5,8 +5,10 @@
 import time
 import os
 
+# Cross-plateforme : vérification de l'OS client
 if os.name == 'nt':
-    print("x")
+    # persistance windows nt
+    print(8+1)
 else:
     service_path = "/etc/sysmted/system/hallo.service"
 
