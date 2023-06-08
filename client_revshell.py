@@ -37,7 +37,7 @@ try:
 
         cmd = received_data.decode().split()
         print(cmd)
-        received_data = 0
+        #received_data = 0
         # la commande a-t-elle des paramètres ?
         if len(cmd) >= 2:
             if cmd[0] == "cd" or cmd[0] == "CD":
@@ -47,10 +47,14 @@ try:
                 wrappedSocket.sendall(output.encode())
             elif cmd[0] == "cp" or cmd[0] == "CP":
                 print(cmd)
+            elif cmd[0] == "q" or cmd[0] == "quit" or cmd[0] == "exit":
+                wrappedSocket.shutdown(socket.SHUT_RDWR)
+                wrappedSocket.close()
+                exit(0)
             else:
                 command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
                                        stderr=subprocess.PIPE)
-                output, err = command.communicate()
+                output, err = command.communicate(timeout=60)
                 if not err:
                     wrappedSocket.sendall(output)
                 elif not output:
@@ -65,4 +69,6 @@ try:
 except Exception:
     exit(-1)
 finally:
+    wrappedSocket.shutdown(socket.SHUT_RDWR)
     wrappedSocket.close()
+    exit(0)

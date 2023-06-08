@@ -19,12 +19,12 @@ context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
                         keyfile="./chiffrement/python_ssl_priv.key")
 
 while True:
-    print(f"[*] Listening to {HOST}:{PORT}")
+    print(f"[*] Listening to {HOST}:{PORT}...")
     conn, addr = sock.accept()
 
     # Envelopper la connexion entrante dans un contexte SSL
     connssl = context.wrap_socket(conn, server_side=True)
-    print(connssl.version())
+    print(f"[+] Session encrypted in {connssl.version()}")
 
     try:
         print(f"[+] Client connected : {addr}")
@@ -41,9 +41,11 @@ while True:
             reply = connssl.recv(1024)
             if not reply:
                 break
-            print(reply)
+            print(reply.decode())
     except Exception:
+        print(f"[-] Fatal error: killing session with {addr}")
         exit(-1)
     finally:
         connssl.shutdown(socket.SHUT_RDWR)
         connssl.close()
+        exit(0)
