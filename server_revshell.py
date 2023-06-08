@@ -42,6 +42,8 @@ while True:
             if not reply:
                 break
             print(reply)
+    except Exception:
+        exit(-1)
     finally:
         connssl.shutdown(socket.SHUT_RDWR)
         connssl.close()

