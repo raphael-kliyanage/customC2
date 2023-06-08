@@ -18,7 +18,7 @@ context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
                         keyfile="./chiffrement/python_ssl_priv.key")
 
-while True:
+while sock:
     print(f"[*] Listening to {HOST}:{PORT}...")
     conn, addr = sock.accept()
 
