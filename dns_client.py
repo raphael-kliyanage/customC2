@@ -6,7 +6,7 @@ import base64
 res = resolver.Resolver()
 
 # Spécifier le serveur DNS
-res.nameservers = ['127.0.0.1']
+res.nameservers = ['192.168.1.6']
 res.port = 1053
 
 # Faire une requête DNS

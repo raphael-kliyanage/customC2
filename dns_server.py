@@ -2,13 +2,12 @@ from dnslib import DNSRecord, DNSHeader, QTYPE, A, RR
 from dnslib.server import DNSServer, DNSHandler, BaseResolver
 from base64 import b64decode
 
-
 class CustomResolver(BaseResolver):
     def resolve(self, request, handler):
         qname = request.q.qname
         qtype = request.q.qtype
 
-        print(f"[+] Requête reçu pour {qname}")
+        print(f"Requête reçu pour {qname}")
 
         reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
 

@@ -21,6 +21,7 @@ sock.listen(1)
 
 # Envelopper la socket dans un contexte SSL
 context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+# chargement du certificat et de la clé privée RSA
 context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
                         keyfile="./chiffrement/python_ssl_priv.key")
 
