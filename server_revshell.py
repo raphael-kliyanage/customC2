@@ -1,5 +1,5 @@
-# client_revershell
-# Version 0.3
+# server_revershell
+# Version 0.4
 # Auteur : Raphaël KATHALUWA-LIYANAGE
 
 import socket
