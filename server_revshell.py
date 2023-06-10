@@ -4,6 +4,7 @@
 
 import socket
 import ssl
+import dns_server
 
 HOST = '0.0.0.0'
 PORT = 25566

