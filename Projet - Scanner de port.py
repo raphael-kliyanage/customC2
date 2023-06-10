@@ -1,19 +1,21 @@
 # TP - Scanner de ports
-# Version 0.2
+# Version 0.3
 # Auteur : Mathis THOUVENIN
 
 # Librairie importée
 import socket
+import subprocess
 import sys
 import os
 from datetime import datetime
 import threading
 import argparse
+import pyfiglet
 
 
 # Fonction pour nettoyer l'affichage
 def clear():
-    # subprocess.call('clear', shell=True)
+    subprocess.call('clear', shell=True)
 
     # OS Windows
     if os.name == 'nt':
@@ -25,36 +27,57 @@ def clear():
 
 
 clear()
-"""""
-# Fonction arguments
-def parse():
 
+
+# Fonction arguments en ligne de commande
+def parser():
     # Initialisation des arguments
     parser = argparse.ArgumentParser(description='Spécifier une gamme de ports différente')
 
-    # Ajout d'arguments
-    parser.add_argument('-p', type=int, help='Port')
+    # Ajout d'arguments port étendu (autre que 1-1024)
+    parser.add_argument('-e', '--extend', dest='extend', action="store_true", help='Scan de port à partir de 1024')
+
+    # Ajout d'arguments pour ne pas utiliser le ping
+    parser.add_argument('-wp', '--without_ping', dest='without_ping', action="store_false",
+                        help='sans utiliser le ping')
+
+    return parser.parse_args()
 
 
-    parser.parse_args()
-parse()
-"""
-# Host qu'on doit scanne
+# Fonction pour mettre une bannière
+def banner():
+    # Définition que de qu'on veut mettre comme bannière
+    scan_banner = pyfiglet.figlet_format("SCAN DE PORT")
+
+    # Affichage de la bannière
+    print(scan_banner)
+
+    return banner
+
+
+# Appel de la fonction bannière
+print("-" * 40)
+banner()
+print("-" * 40)
+
+# Host qu'on doit scan
 host = socket.gethostbyname(input("Entrer une IP ou un domaine : "))
+
+args = parser()
 
 open_ports = {}
 
 
 # On vérifie les ports ouverts
-def scan(ip, port, delay, open_ports):
+def check_scan(ip, port, delay, open_ports):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(delay)
         result = sock.connect_ex((ip, port))
 
         if result == 0:
-            open_ports[port] = 'Port ouvert'
-        # sock.close()
+            open_ports[port] = 'Ouvert'
+            sock.close()
 
     # Gestion d'erreurs
     except KeyboardInterrupt:
@@ -70,50 +93,75 @@ def scan(ip, port, delay, open_ports):
         sys.exit()
 
 
-# On scanne les ports en thread pour plus de rapidité
-def run_scanner(host, delay, file):
+# On scan les ports en thread pour plus de rapidité
+def run_scan(host, delay, file):
     thread_list = []
 
-    for port in range(1, 1025):
-        thread = threading.Thread(target=scan, args=(host, port, delay, open_ports))
-        thread_list.append(thread)
+    # Si on n'utilise pas d'argument pour une plage de port différente que 1 à 1025
+    if args.extend == False:
 
-    for index in range(0, 1024):
-        thread_list[index].start()
+        for port in range(1, 1025):
+            thread = threading.Thread(target=check_scan, args=(host, port, delay, open_ports))
+            thread_list.append(thread)
 
-    for index in range(0, 1024):
-        thread_list[index].join()
+        for index in range(0, 1024):
+            thread_list[index].start()
 
-    for value in open_ports.items():
-        print("Port ouvert : " + str(value))
+        for index in range(0, 1024):
+            thread_list[index].join()
 
-        # On met dans le fichier les ports qui sont ouverts
-        file.write("\nNombre port ouvert: " + str(value))
+        for value in open_ports.items():
+            print("Port ouvert : " + str(value))
+
+            # On met dans le fichier les ports qui sont ouverts
+            file.write("\nNombre port ouvert: " + str(value))
+
+    # Si on utilise l'argument pour une plage de port différente de 1026 à 5000
+    else:
+        # A les utiliser s'il faut que l'utilisateur choissise la plage de port
+        # start_port = int(input("Veuillez renseigner le port par lequel le scan commence : "))
+        # end_port = int(input("Veuillez renseigner le port par lequel le scan se termine : "))
+
+        for port in range(1026, 50001):
+            thread = threading.Thread(target=check_scan, args=(host, port, delay, open_ports))
+            thread_list.append(thread)
+
+        for index in range(1025, 5000):
+            thread_list[index].start()
+
+        for index in range(1025, 5000):
+            thread_list[index].join()
+
+        for value in open_ports.items():
+            print("Port ouvert : " + str(value))
+
+            # On met dans le fichier les ports qui sont ouverts
+            file.write("\nNombre port ouvert: " + str(value))
 
 
-# Créer un fichier pour mettre les informations de la dates ainsi que les ports qui sont ouverts)
+# Créer un fichier pour mettre les informations de la date ainsi que les ports qui sont ouverts
 file = open("scanner-port.txt", "w")
 
 # Vérifier l'heure + mettre en format
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 
-# Affichage du host et la date de début du scanne
+# Affichage du host et la date de début du scan
 print("-" * 40)
 print(f"Cible : {host}")
-print(f"Début du scanne: {current_time}")
+print(f"Début du scan: {current_time}")
 print("-" * 40)
 
-# On écrit la date de début du scanne dans le fichier texte
-file.write("Début du scanne: {}".format(current_time))
+# On écrit la date de début du scan dans le fichier texte
+file.write("Début du scan: {}".format(current_time))
 
-# On appel notre fonction qui scanne les ports avec le host que nous avons indiqué, la durée du scanne et mettre le résultat dans un fichier
-run_scanner(host, 3, file)
+# On appel notre fonction qui scan les ports
+run_scan(host, 5, file)
 
-# Affichage de la date de fin du scanne
+# Affichage de la date de fin du scan
 print("-" * 40)
-print(f"Fin du scanne: {current_time}")
+print(f"Fin du scan: {current_time}")
 
-# On écrit la date de fin du scanne dans le fichier texte
-file.write("\nFin du scanne: {}".format(current_time))
+# On écrit la date de fin du scan dans le fichier texte
+file.write("\nFin du scan: {}".format(current_time))
 print("-" * 40)
