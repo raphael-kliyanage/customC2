@@ -5,7 +5,7 @@
 # import des libraires
 import socket       # communication entre l'attaque et la cible
 import ssl          # chiffrement des échanges
-import dns_server   # exfiltration des données via DNS
+#import dns_server   # exfiltration des données via DNS
 
 # en écoute sur toutes les connexions entrantes
 # 0.0.0.0:25566

