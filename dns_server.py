@@ -2,6 +2,8 @@ from dnslib import DNSRecord, DNSHeader, QTYPE, A, RR
 from dnslib.server import DNSServer, DNSHandler, BaseResolver
 from base64 import b64decode
 
+PORT = 53
+
 class CustomResolver(BaseResolver):
     def resolve(self, request, handler):
         qname = request.q.qname
@@ -26,6 +28,6 @@ class CustomDNSHandler(DNSHandler):
 
 if __name__ == "__main__":
     resolver = CustomResolver()
-    server = DNSServer(resolver, port=1053, handler=CustomDNSHandler)
+    server = DNSServer(resolver, port=PORT, handler=CustomDNSHandler)
 
     server.start()
