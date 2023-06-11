@@ -2,16 +2,21 @@ from dns import resolver
 import subprocess
 import base64
 
-# Créer une instance de resolver
-res = resolver.Resolver()
 
-# Spécifier le serveur DNS
-res.nameservers = ['192.168.1.6']
-res.port = 1053
+def download_file(filename):
+    file = open(filename, 'r')
+    # Créer une instance de resolver
+    res = resolver.Resolver()
 
-# Faire une requête DNS
-answer = res.resolve("test.com", 'A')
+    # Spécifier le serveur DNS
+    res.nameservers = ['127.0.0.1']
+    res.port = 1053
 
-# Afficher la réponse
-for ipval in answer:
-    print('IP', ipval.to_text())
+    # Faire une requête DNS
+    answer = res.resolve("test.com", 'A')
+
+    # Afficher la réponse
+    for ipval in answer:
+        print('IP', ipval.to_text())
+
+download_file("persistance.py")

