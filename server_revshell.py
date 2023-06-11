@@ -11,6 +11,8 @@ import dns_server   # exfiltration des données via DNS
 # 0.0.0.0:25566
 HOST = '0.0.0.0'
 PORT = 25566
+CERTIFICATE = "./chiffrement/python_ssl.pem"
+KEY = "./chiffrement/python_ssl_priv.key"
 # taille des messages : 128kB max
 BUFFER_SIZE = 1024 * 128
 
@@ -22,8 +24,7 @@ sock.listen(1)
 # Envelopper la socket dans un contexte SSL
 context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 # chargement du certificat et de la clé privée RSA
-context.load_cert_chain(certfile="./chiffrement/python_ssl.pem",
-                        keyfile="./chiffrement/python_ssl_priv.key")
+context.load_cert_chain(certfile=CERTIFICATE, keyfile=KEY)
 
 while sock:
     print(f"[*] Listening to {HOST}:{PORT}...")
