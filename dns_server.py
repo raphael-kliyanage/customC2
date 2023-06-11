@@ -2,6 +2,7 @@ from dnslib import DNSRecord, DNSHeader, QTYPE, A, RR
 from dnslib.server import DNSServer, DNSHandler, BaseResolver
 from base64 import b64decode
 
+IP_REPLY = '1.2.3.4'
 PORT = 53
 
 class CustomResolver(BaseResolver):
@@ -14,7 +15,7 @@ class CustomResolver(BaseResolver):
         reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
 
         if qtype == QTYPE.A:
-            reply.add_answer(RR(qname, qtype, rdata=A('1.2.3.4')))
+            reply.add_answer(RR(qname, qtype, rdata=A(IP_REPLY)))
     
         return reply
 
