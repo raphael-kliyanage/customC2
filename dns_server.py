@@ -1,20 +1,22 @@
 from dnslib import DNSRecord, DNSHeader, QTYPE, A, RR
 from dnslib.server import DNSServer, DNSHandler, BaseResolver
-from base64 import b64decode
+import base64 
 from Crypto.Cipher import AES
 #from itertools import batched
 
 IP_REPLY = '1.2.3.4'
 HOST = '0.0.0.0'
 PORT = 53
-RESET_CMD = b'reset'
 
 class CustomResolver(BaseResolver):
     def resolve(self, request, handler):
         qname = request.q.qname
         qtype = request.q.qtype
 
-        print(f"[+] Requête reçu pour {qname}")
+        encoded_data = request.q.qname.label[0].decode()
+        decoded_data = base64.b64decode(encoded_data).decode()
+
+        print(f"[+] Requête reçu pour {decoded_data}")
 
         reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
 
