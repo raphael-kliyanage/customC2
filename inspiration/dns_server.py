@@ -1,32 +1,49 @@
 from dnslib import DNSRecord, DNSHeader, QTYPE, A, RR
 from dnslib.server import DNSServer, DNSHandler, BaseResolver
-from base64 import b64decode
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
+# AES encryption/decryption functions
+def encrypt(plaintext, key):
+    cipher = AES.new(key, AES.MODE_ECB)
+    ciphertext = cipher.encrypt(pad(plaintext.encode(), AES.block_size))
+    return base64.b64encode(ciphertext).decode()
 
-class CustomResolver(BaseResolver):
+def decrypt(ciphertext, key):
+    cipher = AES.new(key, AES.MODE_ECB)
+    decrypted = cipher.decrypt(base64.b64decode(ciphertext))
+    return unpad(decrypted, AES.block_size).decode()
+
+# Custom DNS resolver
+class MyResolver(BaseResolver):
     def resolve(self, request, handler):
-        qname = request.q.qname
-        qtype = request.q.qtype
+        # Extract the query name and type
+        qname = str(request.q.qname)
+        qtype = QTYPE[request.q.qtype]
 
-        print(f"Requête reçu pour {qname}")
+        # Check if the query type is A
+        if qtype == "A":
+            # Decrypt the query name (assuming it's encrypted)
+            decrypted_qname = decrypt(qname, "my_secret_key")
 
-        reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+            # Perform DNS resolution with the decrypted query name
+            resolved_ip = "1.2.3.4"  # Replace with your actual resolution logic
 
-        if qtype == QTYPE.A:
-            reply.add_answer(RR(qname, qtype, rdata=A('1.2.3.4')))
-    
-        return reply
+            # Encrypt the resolved IP before sending the response
+            encrypted_ip = encrypt(resolved_ip, "my_secret_key")
 
-class CustomDNSHandler(DNSHandler):
-    def handle(self):
-        data = self.request[0].strip()
-        socket = self.request[1]
-        request = DNSRecord.parse(data)
-        reply = self.server.resolver.resolve(request, self)
-        socket.sendto(reply.pack(), self.client_address)
+            # Create the DNS response
+            reply = request.reply()
+            reply.add_answer(RR(qname=request.q.qname, rtype=A, rdata=A(encrypted_ip)))
+            return reply
 
-if __name__ == "__main__":
-    resolver = CustomResolver()
-    server = DNSServer(resolver, port=1053, handler=CustomDNSHandler)
+        # If the query type is not A, return an empty response
+        return request.reply()
 
-    server.start()
+# Create a DNS server with the custom resolver
+resolver = MyResolver()
+server = DNSServer(resolver)
+
+# Start the DNS server
+server.start()

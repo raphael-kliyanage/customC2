@@ -51,7 +51,7 @@ while sock:
                 break
             print(reply.decode())
     except Exception:
-        print(f"[-] Fatal error: killing session with {addr}")
+        zprint(f"[-] Fatal error: killing session with {addr}")
         exit(-1)
     finally:
         connssl.shutdown(socket.SHUT_RDWR)

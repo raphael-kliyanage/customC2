@@ -22,6 +22,7 @@ class CustomResolver(BaseResolver):
 
         if qtype == QTYPE.A:
             reply.add_answer(RR(qname, qtype, rdata=A(IP_REPLY)))
+            print(reply)
     
         return reply
 
@@ -33,37 +34,8 @@ class CustomDNSHandler(DNSHandler):
         reply = self.server.resolver.resolve(request, self)
         socket.sendto(reply.pack(), self.client_address)
     
-    """"
-    def shell():
-        cmd = []
-        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        udp_socket.bind((HOST, PORT))
-        print(f"[*] Listening to {HOST}:{PORT}...")
-        try:
-            addr, payload, answer = rx_payload(udp_socket)
-            answer = shell(answer, payload)
-            udp_socket.sendto(answer.pack(), addr)
-
-            while True:
-                addr, payload, answer = rx_payload(udp_socket)
-        except Exception:
-            print(f"[-] Fatal error: killing session with {addr}")
-            exit(-1)
-    """
-
-"""
-def rx_payload(socket):
-    return socket
-
-def shell(dns_answer, payload):
-    return dns_answer, payload
-"""
-    
 if __name__ == "__main__":
     resolver = CustomResolver()
     server = DNSServer(resolver, port=PORT, handler=CustomDNSHandler)
-    #thread = threading.Thread(target=shell)
 
-    #thread.start()
-    #thread.join()
     server.start()

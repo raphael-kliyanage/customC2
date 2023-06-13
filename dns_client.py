@@ -4,6 +4,7 @@ import base64
 
 HOST = '192.168.1.6'
 PORT = 53
+CHUNK_LIMIT = 63
 
 # Créer une instance de resolver
 res = resolver.Resolver()
@@ -12,13 +13,14 @@ res = resolver.Resolver()
 res.nameservers = [HOST]
 res.port = PORT
 
-cmd = b"ipconfig /all"
+cmd = b"Raphael"
 encoded_cmd = base64.b64encode(cmd).decode()
+print(encoded_cmd)
 domain = f"{encoded_cmd}.tkt.fr"
-print(len(domain))
 # Faire une requête DNS
 answer = res.resolve(domain, 'A')
 
 # Afficher la réponse
 for ipval in answer:
     print('IP', ipval.to_text())
+    print(answer)
