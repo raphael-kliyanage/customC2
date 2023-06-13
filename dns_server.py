@@ -22,7 +22,6 @@ class CustomResolver(BaseResolver):
 
         if qtype == QTYPE.A:
             reply.add_answer(RR(qname, qtype, rdata=A(IP_REPLY)))
-            print(reply)
     
         return reply
 

