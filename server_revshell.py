@@ -26,6 +26,7 @@ context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 # chargement du certificat et de la clé privée RSA
 context.load_cert_chain(certfile=CERTIFICATE, keyfile=KEY)
 
+#à mettre dans une fonction
 while sock:
     print(f"[*] Listening to {HOST}:{PORT}...")
     conn, addr = sock.accept()
