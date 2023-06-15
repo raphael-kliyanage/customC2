@@ -17,7 +17,7 @@ class CustomResolver(BaseResolver):
             encoded_data = request.q.qname.label[i].decode()
             decoded_data = base64.b64decode(encoded_data).decode()
 
-            print(f"[+] Requête reçu pour {decoded_data}")
+            print(f"{decoded_data}")
         """
         decoded_data = ""
         for label in qname.label[1:-2]:
