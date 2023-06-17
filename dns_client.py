@@ -9,8 +9,8 @@ from Crypto.Util.Padding import pad, unpad
 # 192.168.1.6:53
 HOST = '192.168.1.6'
 PORT = 53
-KEY = b'277EED8594C6C65M'
-IV = b'A5E8E95AF2723449'
+KEY = b'267eAs?594f6C:5m'
+IV = b'a5E8s9!AF272344_'
 
 def encrypt_aes_cbc(key, iv, plaintext):
     cipher = AES.new(key, AES.MODE_CBC, iv)

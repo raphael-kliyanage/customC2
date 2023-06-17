@@ -12,13 +12,8 @@ IP_REPLY = '1.2.3.4'
 # 0.0.0.0:53
 HOST = '0.0.0.0'
 PORT = 53
-KEY = b'277EED8594C6C65M'
-IV = b'A5E8E95AF2723449'
-
-def encrypt_aes_cbc(key, iv, plaintext):
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    ciphertext = cipher.encrypt(pad(plaintext.encode(), AES.block_size))
-    return base64.b64encode(ciphertext).decode()
+KEY = b'267eAs?594f6C:5m'
+IV = b'a5E8s9!AF272344_'
 
 def decrypt_aes_cbc(key, iv, ciphertext):
     cipher = AES.new(key, AES.MODE_CBC, iv)
@@ -68,6 +63,12 @@ class CustomDNSHandler(DNSHandler):
         # on récupère la socket UDP
         socket = self.request[1]
         request = DNSRecord.parse(data)
+
+        while request.header.qr and len(data) < len(self.request[0]):
+            more_data = b' '
+            data += more_data
+            request = DNSRecord.parse(data)
+
         reply, decoded_data_list = self.server.resolver.resolve(request, self)
         
         try:
