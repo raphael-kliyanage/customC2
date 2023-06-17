@@ -12,8 +12,10 @@ IP_REPLY = '1.2.3.4'
 # 0.0.0.0:53
 HOST = '0.0.0.0'
 PORT = 53
-KEY = b'267eAs?594f6C:5m'
-IV = b'a5E8s9!AF272344_'
+# clé de 32 octets pour utiliser AES-256 CBC
+KEY = b'W3c9vlwl1Cj0tM6FHkh3pZ%OTc+x8ET='
+# vecteur initial de 16 octets
+IV = b'efd6cb512023b721'
 
 class CustomResolver(BaseResolver):
     def resolve(self, request, handler):
@@ -80,6 +82,11 @@ def decrypt_aes_cbc(key, iv, ciphertext):
     decrypted_data = cipher.decrypt(base64.b64decode(ciphertext))
     
     return unpad(decrypted_data, AES.block_size).decode()
+
+def encrypt_aes_cbc(key, iv, plaintext):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(pad(plaintext.encode(), AES.block_size))
+    return base64.b64encode(ciphertext).decode()
 
 def dns_server(dns_port):
     resolver = CustomResolver()

