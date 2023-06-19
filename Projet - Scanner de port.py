@@ -1,5 +1,5 @@
 # TP - Scanner de ports
-# Version 0.3
+# Version 0.5
 # Auteur : Mathis THOUVENIN
 
 # Librairie importée
@@ -55,6 +55,31 @@ def banner():
     return banner
 
 
+# Dictionnaire pour les bannières de services
+services_banners = {
+    20: "FTP Transmission",
+    21: "FTP Connexion",
+    22: "SSH/SFTP",
+    23: "Telnet",
+    25: "SMTP",
+    43: "WHOIS",
+    53: "DNS",
+    80: "HTTP",
+    88: "Kerberos",
+    110: "POP3",
+    115: "SFTP",
+    143: "IMAP",
+    389: "LDAP",
+    443: "HTTPS",
+    514: "Shell",
+    636: "LDAPS",
+    992: "Telnets",
+    993: "IMAPS",
+    995: "POP3S",
+    2049: "NFS",
+    3306: "mysql"
+}
+
 # Appel de la fonction bannière
 print("-" * 40)
 banner()
@@ -67,6 +92,28 @@ args = parser()
 
 open_ports = {}
 
+# Tentative de prendre la bannière des services
+"""
+def get_banner(ip, port):
+
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        sock.connect((ip, port))
+        banner = sock.recv(1024).decode().strip()
+        sock.close()
+        return banner
+
+    except socket.timeout:
+        return "Timeout"
+
+    except ConnectionRefusedError:
+        return "Connexion refusée"
+
+    except:
+        return "Erreur"
+"""
+
 
 # On vérifie les ports ouverts
 def check_scan(ip, port, delay, open_ports):
@@ -76,6 +123,19 @@ def check_scan(ip, port, delay, open_ports):
         result = sock.connect_ex((ip, port))
 
         if result == 0:
+            # Tentative d'introduire les bannières de services
+            """banner = get_banner(ip, port)
+
+            if port in services_banners:
+                service = services_banners[port]
+
+            else:
+                service = "Service inconnu
+
+            open_ports[port] = {
+                'service': service,
+                'banner': banner
+            }"""
             open_ports[port] = 'Ouvert'
             sock.close()
 
@@ -110,6 +170,12 @@ def run_scan(host, delay, file):
         for index in range(0, 1024):
             thread_list[index].join()
 
+        # Tentative d'ajouter l'affichage avec les bannières de services
+        """for port in open_ports:
+            service = open_ports[port]['service']
+            banner = open_ports[port]['banner']
+            print(f"Port {port} ({service}) est ouvert. Bannière : {banner}")"""
+
         for value in open_ports.items():
             print("Port ouvert : " + str(value))
 
@@ -122,7 +188,7 @@ def run_scan(host, delay, file):
         # start_port = int(input("Veuillez renseigner le port par lequel le scan commence : "))
         # end_port = int(input("Veuillez renseigner le port par lequel le scan se termine : "))
 
-        for port in range(1026, 50001):
+        for port in range(1026, 65000):
             thread = threading.Thread(target=check_scan, args=(host, port, delay, open_ports))
             thread_list.append(thread)
 
