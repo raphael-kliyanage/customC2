@@ -46,7 +46,8 @@ class CustomResolver(BaseResolver):
             
             except Exception as e:
                 # Affichage sur la console de toute Exception
-                print(f"Error decoding label: {e}")
+                while e:
+                    print(f"Error decoding label: {e}")
 
         # construction de la réponse (header)
         reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
@@ -82,12 +83,12 @@ class CustomDNSHandler(DNSHandler):
         try:
             # on parcours l'ensemble du tableau contenant les commandes
             for command in decoded_data_list:
-                # affichange du retour du client sans les break lines
+                # affichage du retour du client sans les break lines
                 print(command, end="")
         except Exception as e:
-            
-            # affichage de l'expection
-            print(e)
+            # Affichage sur la console de toute Exception
+            while e:
+                print(f"DNS Error: {e}")
 
         # réponse au client
         socket.sendto(reply.pack(), self.client_address)
@@ -111,18 +112,3 @@ def decrypt_aes_cbc(key, iv, ciphertext):
     
     # retour du texte en clair
     return unpad(decrypted_data, AES.block_size).decode()
-
-"""
-# fonction pour démarrer un serveur DNS
-def dns_server(dns_port):
-    
-    # Création d'une instance
-    resolver = CustomResolver()
-    # Configuration de l'instance
-    server = DNSServer(resolver, port=dns_port, handler=CustomResolver)
-
-    # démarrage
-    print(f"[*] Listening to {HOST}:{PORT}...")
-    server.start()
-"""
-    
